@@ -39,9 +39,9 @@ body {
 
 #modelViewer {
     position: fixed;
-    top: 50%;
-    left: 26%;
-    transform: translate(-51%, -43.5%);
+    top: 90%;
+    left: 52%;
+    transform: translate(-59%, -32.5%);
     width: 1000px;
     height: 670px;
     background: transparent;

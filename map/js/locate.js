@@ -589,8 +589,8 @@ loader.setDRACOLoader(dracoLoader);
         function (gltf) {
             console.log("MODEL SUCCESSFULLY LOADED");
             model = gltf.scene;
-            model.scale.set(0.077, 0.1, 0.1);
-            model.position.y = -1;
+            model.scale.set(0.077, 0.11, 0.1);
+            model.position.y = -1.4;
             scene.add(model);
 
             function animate() {
