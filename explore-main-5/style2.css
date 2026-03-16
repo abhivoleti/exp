@@ -1,0 +1,55 @@
+
+
+body { 
+    margin: 0px; 
+    overflow: hidden; 
+}
+
+
+#map { 
+
+    top: 0px; 
+    bottom: 0px; 
+    width: 100%; 
+    justify-content: center; /* Centers items horizontally */
+    align-items: center;     /* Centers items vertically */
+    height:100vh; 
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* search toggle added to dom */ 
+
+  .mapboxgl-ctrl-geocoder {
+    display: none !important;
+    position: absolute !important;
+
+    transform: translate(-330%,100%) !important;
+    z-index: 100 !important;
+    width: 300px !important;
+    min-width: unset !important;
+    opacity: .7;
+  }
+
+  .geocoder-visible {
+    display: block !important;
+  }
+
+
+#modelViewer {
+    position: fixed;
+    top: 50%;
+    left: 26%;
+    transform: translate(-51%, -43.5%);
+    width: 1000px;
+    height: 670px;
+    background: transparent;
+    z-index: 9999;
+    overflow: visible;
+    z-index: 9; 
+}
+
+
+
+

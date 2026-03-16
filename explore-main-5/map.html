@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3D Map + Search</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- Mapbox links -->
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet"/>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="styleMapbox.css"> <!-- localized, original -> https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css -->
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
+    }
+  }
+</script>
+
+<!-- Coordinate links -->
+<link rel="stylesheet" href="style2.css"/> <!-- deleted -> <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>-->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Font Links -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Jersey+10&display=swap" rel="stylesheet">
+
+<style>
+
+
+</style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+<div id="modelViewer" style="display:none;"></div>
+
+
+
+
+
+<!-- Script here so that I can refer to the assets using a direct path. if in js file, error occurs-->
+<script>
+
+  // body styling 
+  document.body.style.margin="0px";
+  document.body.style.overflow="hidden";
+
+// create map div 
+  /*const mapDiv = document.createElement("div"); 
+  mapDiv.id = "map";
+  document.body.appendChild(mapDiv); 
+  
+  // styling 
+  mapDiv.style.position = "absolute";      // needed for top & bottom to work
+  mapDiv.style.top = "0px";
+  mapDiv.style.bottom = "0px";
+  mapDiv.style.width = "100%";
+  mapDiv.style.height = "100vh";
+  mapDiv.style.display = "flex";           // needed for flex centering
+  mapDiv.style.justifyContent = "center";  // horizontal centering
+  mapDiv.style.alignItems = "center";      // vertical centering
+  mapDiv.style.marginLeft = "auto";
+  mapDiv.style.marginRight = "auto";*/
+
+
+// Create navbar div
+const navDiv = document.createElement("div");
+navDiv.id = "topnav";
+navDiv.style.position = "absolute";  // position it on top
+navDiv.style.top = "0";              // top of the page/container
+navDiv.style.left = "0";             // align left
+navDiv.style.width = "100%";
+navDiv.style.height="auto";         // full width
+navDiv.style.zIndex = "1000";        // make sure it's above the map
+
+// Create image
+const navImg = document.createElement("img");
+navImg.src = "assets/mpassets/taskbara.png";  // make sure path is correct
+navImg.alt = "Navbar background";
+navImg.style.width = "100%";
+navImg.style.height = "auto";
+navImg.style.display = "block";
+
+// Add image to div
+navDiv.appendChild(navImg);
+
+// Add navbar to the body (on top of map)
+document.body.appendChild(navDiv); // comment out to hide search bar 
+
+// nav buttons  
+// Logo 
+const logo = document.createElement("div");
+logo.id="logo"; 
+navDiv.appendChild(logo); 
+
+logo.style.width = "100px";
+logo.style.height = "60px";
+logo.style.padding = "0";  
+logo.style.top = "0";      // near bottom of the parent/div
+logo.style.left = "2%";     // position from left
+logo.style.border = "none";  // remove default border
+logo.style.background = "none"; // remove default button background
+logo.style.cursor = "pointer";  // pointer on hover
+logo.style.position = "absolute"; // overlay
+logo.style.backgroundColor = "none";
+logo.style.zIndex = "30";
+logo.backgroundImage="url(https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyZHh0MmFpNXhsNDQxazcxaWFxaXU4YTV4bHBxbnR0ZmszaXRnNW1pbCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/xT9IgzvnOyNDYnxeHS/200w.gif)"; 
+
+logo.onclick = function () { // direct to new page 
+  window.location.href = "index.html";
+};
+
+// About 
+const about = document.createElement("button");
+about.id="about-btn";
+navDiv.appendChild(about);
+// Set the size and position
+about.style.width = "10%";
+about.style.height = "auto";
+about.style.padding = "0";  
+about.style.top = "20%";      // near bottom of the parent/div
+about.style.left = "49%";     // position from left
+about.style.border = "none";  // remove default border
+about.style.background = "none"; // remove default button background
+about.style.cursor = "pointer";  // pointer on hover
+about.style.position = "absolute"; // overlay
+
+// Add the image inside the gmap button
+const aboutImg = document.createElement("img");
+aboutImg.src = "assets/mpassets/about.png"; // your image path
+aboutImg.style.width = "100%";   // fills the button width
+aboutImg.style.height = "auto";  // fills the button height
+aboutImg.style.display = "block"; // removes inline spacing
+about.appendChild(aboutImg);
+
+// Hover photo
+about.addEventListener("mouseenter", () => {
+  aboutImg.src = "assets/mpassets/hoverabout.png"; // image to show on hover
+});
+about.addEventListener("mouseleave", () => {  
+  aboutImg.src = "assets/mpassets/about.png"; // revert back
+});
+about.addEventListener("click", () => {
+  window.location.href = "about.html";
+});
+
+
+
+// Gallery 
+const gallery = document.createElement("button");
+gallery.id = "gallery-btn";
+navDiv.appendChild(gallery);
+
+// Set the size and position
+gallery.style.width = "10%";
+gallery.style.height = "auto";
+gallery.style.padding = "0";  
+gallery.style.top = "20%";      // near bottom of the parent/div
+gallery.style.left = "40%";     // position from left
+gallery.style.border = "none";  // remove default border
+gallery.style.background = "none"; // remove default button background
+gallery.style.cursor = "pointer";  // pointer on hover
+gallery.style.position = "absolute"; // overlay
+
+// Add the image inside the gallery button
+const galleryImg = document.createElement("img");
+galleryImg.src = "assets/mpassets/gallery.png"; // updated image path
+galleryImg.style.width = "100%";   // fills the button width
+galleryImg.style.height = "auto";  // fills the button height
+galleryImg.style.display = "block"; // removes inline spacing
+
+gallery.appendChild(galleryImg);
+
+
+// Hover photo
+gallery.addEventListener("mouseenter", () => {
+  galleryImg.src = "assets/mpassets/hovergallery.png"; // image to show on hover
+});
+gallery.addEventListener("mouseleave", () => {  
+  galleryImg.src = "assets/mpassets/gallery.png"; // revert back
+});
+gallery.addEventListener("click", () => {
+  window.location.href = "gallery.html";
+});
+
+// Search 
+
+// Create search button
+const search = document.createElement("button");
+search.id = "searchToggle";
+navDiv.appendChild(search);
+
+// Set the size and position
+search.style.width = "2.8%";
+search.style.height = "auto";
+search.style.padding = "0";  
+search.style.top = "20%";      // near bottom of the parent/div
+search.style.left = "90%";     // position from left
+search.style.border = "none";  // remove default border
+search.style.background = "none"; // remove default button background
+search.style.cursor = "pointer";  // pointer on hover
+search.style.position = "absolute"; // overlay
+
+// Add the image inside the search button
+const searchImg = document.createElement("img");
+searchImg.src = "assets/mpassets/search.png"; // your search icon image path
+searchImg.style.width = "100%";   // fills the button width
+searchImg.style.height = "auto";  // fills the button height
+searchImg.style.display = "block"; // removes inline spacing
+
+search.appendChild(searchImg);
+
+// Hover photo
+search.addEventListener("mouseenter", () => {
+  searchImg.src = "assets/mpassets/hoversearch.png"; // image to show on hover
+});
+search.addEventListener("mouseleave", () => {  
+  searchImg.src = "assets/mpassets/search.png"; // revert back
+});
+
+
+// loading div 
+const errorLoadDiv = document.createElement("div");
+errorLoadDiv.id="loading-popup"; 
+document.body.appendChild(errorLoadDiv);
+
+// styling 
+errorLoadDiv.style.visibility = "hidden";
+errorLoadDiv.style.position = "fixed";
+errorLoadDiv.style.top = "0";
+errorLoadDiv.style.left = "0";
+errorLoadDiv.style.width = "100%";
+errorLoadDiv.style.height = "100%";
+errorLoadDiv.style.display = "flex";
+errorLoadDiv.style.justifyContent = "center";
+errorLoadDiv.style.alignItems = "center";
+errorLoadDiv.style.zIndex = "99";
+errorLoadDiv.style.opacity = "1";
+
+// vid for when load  
+const errorLoadVid = document.createElement("video");
+errorLoadVid.src = "assets/loading.MOV"; 
+errorLoadDiv.appendChild(errorLoadVid)
+
+// Style the video
+errorLoadVid.style.width = "40%";   
+errorLoadVid.style.height = "auto"; 
+errorLoadVid.style.display = "block"; 
+
+errorLoadVid.loop = true;   
+errorLoadVid.autoplay = true; 
+errorLoadVid.muted = true; 
+
+// loading error popup handler 
+const errorDiv = document.createElement("div");
+errorDiv.id="error-popup";
+document.body.appendChild(errorDiv) 
+
+// image 
+const errorImg = document.createElement("img");
+errorImg.src = "assets/mpassets/error.png"; // your search icon image path
+errorImg.style.width = "35%";   // fills the button width
+errorImg.style.height = "auto";  // fills the button height
+errorImg.style.display = "block"; // removes inline spacing
+errorDiv.appendChild(errorImg);
+
+// stying 
+errorDiv.style.visibility="hidden"; 
+errorDiv.style.position = "fixed";
+errorDiv.style.top = "0";
+errorDiv.style.left = "0";
+errorDiv.style.width = "100%";
+errorDiv.style.height = "100%";
+errorDiv.style.color = "white";                // Text color
+errorDiv.style.display = "flex";
+errorDiv.style.justifyContent = "center";
+errorDiv.style.alignItems = "center";
+errorDiv.style.zIndex = "9";
+errorDiv.style.opacity = "1";
+
+// error div okay button 
+const okImg = document.createElement("img"); 
+okImg.id = "ok-btn";
+okImg.src="assets/mpassets/ok.png"; 
+
+// styling
+okImg.style.height = "auto";  // fills the button height
+okImg.style.display = "block"; // removes inline spacing
+okImg.style.width = "8%";
+okImg.style.height = "auto";
+okImg.style.padding = "0";      
+okImg.style.top = "57%";             // top-left corner
+okImg.style.left = "62%";
+okImg.style.border = "none";        // remove default border
+okImg.style.background = "none";    // remove default button background
+okImg.style.cursor = "pointer";     // pointer on hover
+okImg.style.position = "absolute";  // overlay
+okImg.style.zIndex = "100";
+
+//errorDiv.appendChild(okImg);
+
+// Hover photo
+okImg.addEventListener("mouseenter", () => {
+  okImg.src = "assets/mpassets/okhover.png"; // image to show on hover
+});
+okImg.addEventListener("mouseleave", () => {  
+  okImg.src = "assets/mpassets/ok.png"; // revert back
+});
+
+
+// Create loading overlay
+const loadingDiv = document.createElement("div"); 
+loadingDiv.id="loading-overlay";
+document.body.appendChild(loadingDiv); 
+
+// styling 
+loadingDiv.style.position = "fixed";
+loadingDiv.style.top = "0";
+loadingDiv.style.left = "0";
+loadingDiv.style.width = "100%";
+loadingDiv.style.height = "100%";
+loadingDiv.style.background = "black";
+loadingDiv.style.color = "white";
+loadingDiv.style.display = "flex";
+loadingDiv.style.justifyContent = "center";
+loadingDiv.style.alignItems = "center";
+loadingDiv.style.zIndex = "999";
+loadingDiv.style.opacity = "1";
+loadingDiv.style.backgroundColor="white"; 
+
+// Set GIF as background
+//loadingDiv.style.backgroundImage = "url('')";
+loadingDiv.style.backgroundSize = "cover";
+loadingDiv.style.backgroundRepeat = "no-repeat";
+loadingDiv.style.backgroundPosition = "center";
+
+
+// Create a background div for the GIF (not being used)
+const bgDiv = document.createElement("div");
+bgDiv.style.position = "absolute";
+bgDiv.style.top = "0";
+bgDiv.style.left = "0";
+bgDiv.style.width = "100%";
+bgDiv.style.height = "100%";
+bgDiv.style.backgroundImage = "url('https://64.media.tumblr.com/2960c5b1c0a4083c0d6f2ce8d3421586/tumblr_nam48mpqlc1rk0k2jo1_500.gif')";
+bgDiv.style.backgroundSize = "cover";
+bgDiv.style.backgroundPosition = "center";
+bgDiv.style.backgroundRepeat = "no-repeat";
+bgDiv.style.filter = "invert(1)";
+
+
+// Reduce only the background’s opacity
+bgDiv.style.opacity = "0.9"; // 60% transparent
+
+// Make sure text stays on top
+//loadingDiv.appendChild(bgDiv); 
+
+
+// time out loading screen
+function fadeOut(div, duration = 100) {
+  let opacity = 1;
+  const interval = 50;
+  const decrement = interval / duration;
+
+  const fade = setInterval(() => {
+    opacity -= decrement;
+    div.style.opacity = opacity;
+    if (opacity <= 0) {
+      clearInterval(fade);
+      div.style.display = "none";
+    }
+  }, interval);
+}
+
+// fade out after 1 second
+setTimeout(() => {
+  fadeOut(loadingDiv, 2000); // fade over 2 second
+}, 1000);
+
+
+
+
+// Create results div 
+const coorsDiv = document.createElement("div");
+coorsDiv.id = "coordinate-results"; 
+document.body.appendChild(coorsDiv);
+
+// styling 
+coorsDiv.style.zIndex = "100";        // make sure it's above the map
+coorsDiv.style.position = "fixed";  // stays on screen even on scroll
+coorsDiv.style.textAlign="center"; // aligns coordinates in the middle 
+coorsDiv.style.top = "50%";
+coorsDiv.style.left = "50%";
+coorsDiv.style.transform = "translate(-50%, -50%)"; // center exactly
+coorsDiv.style.width = "25vw";
+coorsDiv.style.fontSize = "1vw"; // scales with viewport width
+
+
+// Create image for results div 
+const coorsImg = document.createElement("img");
+coorsImg.src = "assets/mpassets/buildingdeet.png";  // make sure path is correct
+coorsImg.setAttribute("data-pin-nopin", "true"); // remove the freaken pinterest icon 
+coorsImg.alt = "Coordinate results background";
+coorsImg.style.width = "100%";
+coorsImg.style.height = "auto";
+coorsImg.style.display = "block";
+coorsImg.style.position = "relative";
+coorsImg.style.borderRadius = "8px";
+coorsDiv.appendChild(coorsImg); 
+
+// close button
+const close = document.createElement("button");
+close.id = "close-btn";
+coorsDiv.appendChild(close);
+
+// set the size
+close.style.width = "6%";
+close.style.height = "7%";
+close.style.padding = "0";  
+close.style.top = "2%";  // top-left corner
+close.style.left = "2%";
+close.style.border = "none"; // remove default border
+close.style.background = "none"; // remove default button background
+close.style.cursor = "pointer";  // pointer on hover
+close.style.position = "absolute";  // overlay
+
+// Add the image inside the button
+const closeImg = document.createElement("img");
+closeImg.src = "assets/mpassets/close.png"; // your image path
+closeImg.style.width = "100%";  // fills the button width
+closeImg.style.height = "auto"; // fills the button height
+closeImg.style.display = "block"; // removes inline spacing
+
+close.appendChild(closeImg);
+
+
+// gmap button
+const gmap = document.createElement("button");
+gmap.id = "gmap-btn";
+coorsDiv.appendChild(gmap);
+
+// Set the size and position
+gmap.style.width = "30%";
+gmap.style.height = "auto";
+gmap.style.padding = "0";  
+gmap.style.top = "90%";             // top-left corner
+gmap.style.left = "65%";
+gmap.style.border = "none";        // remove default border
+gmap.style.background = "none";    // remove default button background
+gmap.style.cursor = "pointer";     // pointer on hover
+gmap.style.position = "absolute";  // overlay
+
+// Add the image inside the gmap button
+const gmapImg = document.createElement("img");
+gmapImg.src = "assets/mpassets/googlemaps.png"; // your image path
+gmapImg.style.width = "100%";   // fills the button width
+gmapImg.style.height = "auto";  // fills the button height
+gmapImg.style.display = "block"; // removes inline spacing
+
+gmap.appendChild(gmapImg);
+
+// Hover photo
+gmap.addEventListener("mouseenter", () => {
+  gmapImg.src = "assets/mpassets/hovergooglemaps.png"; // image to show on hover
+});
+gmap.addEventListener("mouseleave", () => {  
+  gmapImg.src = "assets/mpassets/googlemaps.png"; // revert back
+});
+
+
+
+
+</script> 
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
+    }
+  }
+</script>
+
+<script type="module" src="js/locate.js" defer></script>
+
+<!--<script src="js/locate.js" defer></script>--> 
+
+
+</body>
+</html>

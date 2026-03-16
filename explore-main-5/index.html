@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0">
+
+<title>space3</title>
+<link rel="stylesheet" href="css/style1.css">
+</head>
+<body>
+
+
+
+    </div>
+    <div class="footer"></div>
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+          
+
+    <!-- <div id= "logo-div">
+    <img src='assets/images/logo1.png'>
+    </div> --->
+
+<script>
+    // body 
+    document.body.style.width = "100vw";
+    document.body.style.height = "500vh";
+    document.body.style.backgroundColor = "white";
+    document.body.style.overflowX = "hidden";
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.boxSizing = "border-box";
+
+    // canvas 
+
+
+
+
+
+    // logo div 
+   const logoDiv = document.createElement("div"); 
+   logoDiv.id = "logo-div";
+   document.body.appendChild(logoDiv); 
+
+    // logo image
+    const logoImg = document.createElement("img")
+    logoImg.src="assets/images/logo1.png"; 
+
+    // styling 
+    logoImg.style.width="100%"; 
+    logoDiv.appendChild(logoImg)
+
+    logoDiv.style.position = "fixed";
+    logoDiv.style.top = "90px";
+    logoDiv.style.left = "80vw";
+    logoDiv.style.width = "600px";
+    logoDiv.style.height = "auto";
+    logoDiv.style.transform = "translateX(-50%)";
+    logoDiv.style.zIndex = "99";
+    logoDiv.style.pointerEvents = "none";
+
+    // next page button 
+    const navDiv = document.createElement("div"); 
+    navDiv.id = "nav-div";
+    document.body.appendChild(navDiv); 
+
+    // styling 
+    navDiv.style.position = "fixed";
+    navDiv.style.top = "659px";
+    navDiv.style.left = "70vw";
+    navDiv.style.width = "46px";
+    navDiv.style.height = "auto";
+    navDiv.style.transform = "translateX(-50%)";
+    navDiv.style.zIndex = "99";
+
+    // image 
+    const navImg = document.createElement("img");
+    navImg.src = "assets/images/nav.png";
+
+    navImg.style.position = "relative";
+    navImg.style.zIndex="99";
+    navDiv.appendChild(navImg); 
+
+    // Hover photo
+    navDiv.addEventListener("mouseenter", () => {
+    navImg.src = "assets/images/navone.png"; // image to show on hover
+    });
+    navDiv.addEventListener("mouseleave", () => {  
+    navImg.src = "assets/images/nav.png"; // revert back
+    });
+
+    // make Nav Image clickable 
+    navDiv.onclick = () => {
+        window.location.href = "map.html";
+    };
+    
+
+    // Create loading overlay
+    const loadingDiv = document.createElement("div"); 
+    loadingDiv.id="loading-overlay";
+    document.body.appendChild(loadingDiv); 
+
+    // styling 
+    loadingDiv.style.position = "fixed";
+    loadingDiv.style.top = "0";
+    loadingDiv.style.left = "0";
+    loadingDiv.style.width = "100%";
+    loadingDiv.style.height = "100%";
+    loadingDiv.style.background = "black";
+    loadingDiv.style.color = "white";
+    loadingDiv.style.display = "flex";
+    loadingDiv.style.justifyContent = "center";
+    loadingDiv.style.alignItems = "center";
+    loadingDiv.style.zIndex = "99";
+    loadingDiv.style.opacity = "1";
+    loadingDiv.style.backgroundColor="white"; 
+
+
+    // time out loading screen
+    function fadeOut(div, duration = 100) {
+    let opacity = 1;
+    const interval = 50;
+    const decrement = interval / duration;
+
+    const fade = setInterval(() => {
+        opacity -= decrement;
+        div.style.opacity = opacity;
+        if (opacity <= 0) {
+        clearInterval(fade);
+        div.style.display = "none";
+        }
+    }, interval);
+    }
+
+    // fade out after 1 second
+    setTimeout(() => {
+    fadeOut(loadingDiv, 2000); // fade over 2 second
+    }, 1000);
+</script>
+<script src="js/script1.js" defer ></script>  
+
+
+</body>
+</html>
